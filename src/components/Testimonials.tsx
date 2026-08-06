@@ -1,5 +1,6 @@
 import { Quote, Star } from 'lucide-react';
 import { Section, SectionHeading } from '@/components/Section';
+import { useContent, useSettings } from '@/lib/live';
 
 interface Testimonial {
   name: string;
@@ -9,43 +10,29 @@ interface Testimonial {
   image: string;
 }
 
-const TESTIMONIALS: Testimonial[] = [
-  {
-    name: 'Daniel Mercer',
-    company: 'Lumen DTC',
-    rating: 5,
-    quote: 'Nexora rebuilt our brand and store and rebuilt our pipeline with it. We hit a 4x in qualified leads inside two quarters — and the work still looks beautiful.',
-    image: 'https://images.pexels.com/photos/7752811/pexels-photo-7752811.jpeg?auto=compress&cs=tinysrgb&w=400',
-  },
-  {
-    name: 'Priya Nair',
-    company: 'Quantix SaaS',
-    rating: 5,
-    quote: 'The most senior team we have worked with. Strategy, design, and engineering under one roof meant no finger-pointing — just results, month after month.',
-    image: 'https://images.pexels.com/photos/33680700/pexels-photo-33680700.jpeg?auto=compress&cs=tinysrgb&w=400',
-  },
-  {
-    name: 'James Whitfield',
-    company: 'Northwind Group',
-    rating: 5,
-    quote: 'Their reporting is the first we have actually trusted. Transparent, real-time, and tied to revenue — not vanity metrics. A genuine growth partner.',
-    image: 'https://images.pexels.com/photos/35490806/pexels-photo-35490806.jpeg?auto=compress&cs=tinysrgb&w=400',
-  },
-  {
-    name: 'Sofia Almeida',
-    company: 'Vela Finance',
-    rating: 5,
-    quote: 'They shipped our Flutter app in 10 weeks — native feel, zero compromises. Our store rating went from 3.4 to 4.8 within a month of launch.',
-    image: 'https://images.pexels.com/photos/8312669/pexels-photo-8312669.jpeg?auto=compress&cs=tinysrgb&w=400',
-  },
-  {
-    name: 'Marcus Bennett',
-    company: 'Helios Energy',
-    rating: 5,
-    quote: 'The lifecycle email program alone paid for the entire engagement in under 90 days. Genuinely the best agency investment we have made.',
-    image: 'https://images.pexels.com/photos/7752813/pexels-photo-7752813.jpeg?auto=compress&cs=tinysrgb&w=400',
-  },
+interface HeadingSettings {
+  eyebrow: string;
+  titlePrefix: string;
+  titleHighlight: string;
+  titleSuffix: string;
+  description: string;
+}
+
+const FALLBACK_TESTIMONIALS: (Testimonial & { id: string })[] = [
+  { id: '1', name: 'Daniel Mercer', company: 'Lumen DTC', rating: 5, quote: 'Nexora rebuilt our brand and store and rebuilt our pipeline with it. We hit a 4x in qualified leads inside two quarters — and the work still looks beautiful.', image: 'https://images.pexels.com/photos/7752811/pexels-photo-7752811.jpeg?auto=compress&cs=tinysrgb&w=400' },
+  { id: '2', name: 'Priya Nair', company: 'Quantix SaaS', rating: 5, quote: 'The most senior team we have worked with. Strategy, design, and engineering under one roof meant no finger-pointing — just results, month after month.', image: 'https://images.pexels.com/photos/33680700/pexels-photo-33680700.jpeg?auto=compress&cs=tinysrgb&w=400' },
+  { id: '3', name: 'James Whitfield', company: 'Northwind Group', rating: 5, quote: 'Their reporting is the first we have actually trusted. Transparent, real-time, and tied to revenue — not vanity metrics. A genuine growth partner.', image: 'https://images.pexels.com/photos/35490806/pexels-photo-35490806.jpeg?auto=compress&cs=tinysrgb&w=400' },
+  { id: '4', name: 'Sofia Almeida', company: 'Vela Finance', rating: 5, quote: 'They shipped our Flutter app in 10 weeks — native feel, zero compromises. Our store rating went from 3.4 to 4.8 within a month of launch.', image: 'https://images.pexels.com/photos/8312669/pexels-photo-8312669.jpeg?auto=compress&cs=tinysrgb&w=400' },
+  { id: '5', name: 'Marcus Bennett', company: 'Helios Energy', rating: 5, quote: 'The lifecycle email program alone paid for the entire engagement in under 90 days. Genuinely the best agency investment we have made.', image: 'https://images.pexels.com/photos/7752813/pexels-photo-7752813.jpeg?auto=compress&cs=tinysrgb&w=400' },
 ];
+
+const FALLBACK_HEADING: HeadingSettings = {
+  eyebrow: 'Client voices',
+  titlePrefix: 'Trusted by operators who',
+  titleHighlight: 'measure everything',
+  titleSuffix: '',
+  description: 'Real outcomes from real partners — across e-commerce, SaaS, finance, and energy.',
+};
 
 function Stars({ n }: { n: number }) {
   return (
@@ -58,20 +45,23 @@ function Stars({ n }: { n: number }) {
 }
 
 export function Testimonials() {
+  const testimonials = useContent<Testimonial>('testimonials', FALLBACK_TESTIMONIALS);
+  const heading = useSettings('testimonials_heading', FALLBACK_HEADING);
+
   return (
     <Section id="testimonials" className="py-24 sm:py-28">
       <SectionHeading
-        eyebrow="Client voices"
-        title={<>Trusted by operators who <span className="gradient-text">measure everything</span></>}
-        description="Real outcomes from real partners — across e-commerce, SaaS, finance, and energy."
+        eyebrow={heading.eyebrow}
+        title={<>{heading.titlePrefix} <span className="gradient-text">{heading.titleHighlight}</span> {heading.titleSuffix}</>}
+        description={heading.description}
       />
 
       {/* Slider layout: a marquee of premium cards */}
       <div className="mask-fade-r mt-14 overflow-hidden">
         <div className="flex w-max animate-marquee gap-5 hover:[animation-play-state:paused]">
-          {[...TESTIMONIALS, ...TESTIMONIALS].map((t, i) => (
+          {[...testimonials, ...testimonials].map((t, i) => (
             <article
-              key={`${t.name}-${i}`}
+              key={`${t.id}-${i}`}
               className="relative w-[20rem] shrink-0 overflow-hidden rounded-3xl border border-line bg-white p-6 shadow-card transition-all duration-500 hover:shadow-lift sm:w-[24rem]"
             >
               <Quote className="absolute right-5 top-5 h-10 w-10 text-primary-100" />

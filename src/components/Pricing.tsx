@@ -1,5 +1,6 @@
 import { ArrowRight, Check, Sparkles } from 'lucide-react';
 import { Section, SectionHeading } from '@/components/Section';
+import { useContent, useSettings } from '@/lib/live';
 
 interface Plan {
   name: string;
@@ -11,8 +12,17 @@ interface Plan {
   popular?: boolean;
 }
 
-const PLANS: Plan[] = [
+interface HeadingSettings {
+  eyebrow: string;
+  titlePrefix: string;
+  titleHighlight: string;
+  titleSuffix: string;
+  description: string;
+}
+
+const FALLBACK_PLANS: (Plan & { id: string })[] = [
   {
+    id: '1',
     name: 'Starter',
     price: '$1,900',
     cadence: '/ month',
@@ -21,6 +31,7 @@ const PLANS: Plan[] = [
     cta: 'Start with Starter',
   },
   {
+    id: '2',
     name: 'Growth',
     price: '$4,900',
     cadence: '/ month',
@@ -30,6 +41,7 @@ const PLANS: Plan[] = [
     popular: true,
   },
   {
+    id: '3',
     name: 'Enterprise',
     price: 'Custom',
     cadence: '',
@@ -39,17 +51,28 @@ const PLANS: Plan[] = [
   },
 ];
 
+const FALLBACK_HEADING: HeadingSettings = {
+  eyebrow: 'Pricing',
+  titlePrefix: 'Simple plans,',
+  titleHighlight: 'serious outcomes',
+  titleSuffix: '',
+  description: 'Transparent monthly engagements. No long lock-ins, no hidden line items — cancel anytime.',
+};
+
 export function Pricing() {
+  const plans = useContent<Plan>('pricing', FALLBACK_PLANS);
+  const heading = useSettings<HeadingSettings>('pricing_heading', FALLBACK_HEADING);
+
   return (
     <Section id="pricing" className="py-24 sm:py-28">
       <SectionHeading
-        eyebrow="Pricing"
-        title={<>Simple plans, <span className="gradient-text">serious outcomes</span></>}
-        description="Transparent monthly engagements. No long lock-ins, no hidden line items — cancel anytime."
+        eyebrow={heading.eyebrow}
+        title={<>{heading.titlePrefix} <span className="gradient-text">{heading.titleHighlight}</span> {heading.titleSuffix}</>}
+        description={heading.description}
       />
 
       <div className="mt-14 grid items-stretch gap-6 lg:grid-cols-3">
-        {PLANS.map((p, i) => (
+        {plans.map((p, i) => (
           <div
             key={p.name}
             className={`reveal relative flex flex-col overflow-hidden rounded-3xl border p-7 transition-all duration-500 sm:p-8 ${
@@ -84,7 +107,8 @@ export function Pricing() {
               ))}
             </ul>
 
-            <button
+            <a
+              href="#contact"
               className={`group mt-8 inline-flex w-full items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold transition-all duration-300 active:scale-[0.98] ${
                 p.popular
                   ? 'bg-primary-600 text-white shadow-[0_8px_24px_-8px_rgba(16,185,129,0.6)] hover:bg-primary-700'
@@ -93,7 +117,7 @@ export function Pricing() {
             >
               {p.cta}
               <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
-            </button>
+            </a>
           </div>
         ))}
       </div>

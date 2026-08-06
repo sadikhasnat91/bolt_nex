@@ -3,16 +3,14 @@ import { useEffect, useRef, useState } from 'react';
 /**
  * Reveal-on-scroll hook. Adds `is-visible` to elements with the `reveal` class
  * when they enter the viewport. Supports an optional stagger delay (ms).
+ * Uses MutationObserver so dynamically fetched CMS content is automatically observed.
  */
 export function useReveal<T extends HTMLElement = HTMLDivElement>() {
   const ref = useRef<T | null>(null);
 
   useEffect(() => {
-    const root = ref.current ?? document;
-    const nodes = (root as HTMLElement).querySelectorAll<HTMLElement>('.reveal');
-
-    if (!('IntersectionObserver' in window) || nodes.length === 0) {
-      nodes.forEach((n) => n.classList.add('is-visible'));
+    if (!('IntersectionObserver' in window)) {
+      document.querySelectorAll('.reveal').forEach((n) => n.classList.add('is-visible'));
       return;
     }
 
@@ -27,11 +25,29 @@ export function useReveal<T extends HTMLElement = HTMLDivElement>() {
           }
         });
       },
-      { threshold: 0.12, rootMargin: '0px 0px -8% 0px' },
+      { threshold: 0.05, rootMargin: '0px 0px 15% 0px' }
     );
 
-    nodes.forEach((n) => io.observe(n));
-    return () => io.disconnect();
+    const observeNodes = () => {
+      const root = ref.current ?? document;
+      const nodes = (root as HTMLElement).querySelectorAll<HTMLElement>('.reveal:not(.is-visible)');
+      nodes.forEach((n) => io.observe(n));
+    };
+
+    // Observe currently rendered nodes
+    observeNodes();
+
+    // Observe any new nodes added dynamically via CMS hooks / live updates
+    const mo = new MutationObserver(() => {
+      observeNodes();
+    });
+
+    mo.observe(document.body, { childList: true, subtree: true });
+
+    return () => {
+      io.disconnect();
+      mo.disconnect();
+    };
   }, []);
 
   return ref;

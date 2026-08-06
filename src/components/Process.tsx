@@ -1,41 +1,60 @@
-import { Compass, FlaskConical, LineChart, PenTool, Rocket, Search, ShieldCheck, TestTube2 } from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
 import { Section, SectionHeading } from '@/components/Section';
+import { getIcon } from '@/content/icons';
+import { useContent, useSettings } from '@/lib/live';
 
 interface Step {
-  icon: LucideIcon;
+  icon: string;
   title: string;
   description: string;
 }
 
-const STEPS: Step[] = [
-  { icon: Compass, title: 'Discovery', description: 'We immerse in your business, goals, and market to define what success looks like.' },
-  { icon: Search, title: 'Research', description: 'Audience, competitor, and keyword research that grounds every decision in evidence.' },
-  { icon: LineChart, title: 'Planning', description: 'A prioritized roadmap with clear KPIs, milestones, and ownership across disciplines.' },
-  { icon: PenTool, title: 'Design', description: 'Brand-led, conversion-focused design systems crafted for every touchpoint.' },
-  { icon: FlaskConical, title: 'Development', description: 'Fast, accessible, scalable builds — websites, apps, and automations shipped clean.' },
-  { icon: TestTube2, title: 'Testing', description: 'Rigorous QA and experimentation to de-risk launches and find upside early.' },
-  { icon: Rocket, title: 'Launch', description: 'Coordinated go-live with monitoring, analytics, and rollback in place.' },
-  { icon: ShieldCheck, title: 'Growth', description: 'Continuous optimization and reporting that compounds results over time.' },
+interface HeadingSettings {
+  eyebrow: string;
+  titlePrefix: string;
+  titleHighlight: string;
+  titleSuffix: string;
+  description: string;
+}
+
+const FALLBACK_STEPS: (Step & { id: string })[] = [
+  { id: '1', icon: 'Compass', title: 'Discovery', description: 'We immerse in your business, goals, and market to define what success looks like.' },
+  { id: '2', icon: 'Search', title: 'Research', description: 'Audience, competitor, and keyword research that grounds every decision in evidence.' },
+  { id: '3', icon: 'LineChart', title: 'Planning', description: 'A prioritized roadmap with clear KPIs, milestones, and ownership across disciplines.' },
+  { id: '4', icon: 'PenTool', title: 'Design', description: 'Brand-led, conversion-focused design systems crafted for every touchpoint.' },
+  { id: '5', icon: 'FlaskConical', title: 'Development', description: 'Fast, accessible, scalable builds — websites, apps, and automations shipped clean.' },
+  { id: '6', icon: 'TestTube2', title: 'Testing', description: 'Rigorous QA and experimentation to de-risk launches and find upside early.' },
+  { id: '7', icon: 'Rocket', title: 'Launch', description: 'Coordinated go-live with monitoring, analytics, and rollback in place.' },
+  { id: '8', icon: 'ShieldCheck', title: 'Growth', description: 'Continuous optimization and reporting that compounds results over time.' },
 ];
 
+const FALLBACK_HEADING: HeadingSettings = {
+  eyebrow: 'How we work',
+  titlePrefix: 'A process built to',
+  titleHighlight: 'compound',
+  titleSuffix: '',
+  description: 'Eight disciplined stages — from first conversation to long-term growth — that turn ambition into outcomes.',
+};
+
 export function Process() {
+  const steps = useContent<Step>('process', FALLBACK_STEPS);
+  const heading = useSettings('process_heading', FALLBACK_HEADING);
+
   return (
     <Section id="process" className="py-24 sm:py-28">
       <SectionHeading
-        eyebrow="How we work"
-        title={<>A process built to <span className="gradient-text">compound</span></>}
-        description="Eight disciplined stages — from first conversation to long-term growth — that turn ambition into outcomes."
+        eyebrow={heading.eyebrow}
+        title={<>{heading.titlePrefix} <span className="gradient-text">{heading.titleHighlight}</span> {heading.titleSuffix}</>}
+        description={heading.description}
       />
 
       {/* Horizontal scroll on small screens, grid on large */}
       <div className="mt-14 -mx-5 overflow-x-auto px-5 pb-4 sm:mx-0 sm:overflow-visible sm:px-0 [scrollbar-width:thin]">
         <div className="flex min-w-max gap-5 lg:grid lg:grid-cols-4 lg:min-w-0">
-          {STEPS.map((s, i) => {
-            const Icon = s.icon;
+          {steps.map((s, i) => {
+            const Icon = getIcon(s.icon);
             return (
               <div
-                key={s.title}
+                key={s.id}
                 className="reveal group relative w-64 shrink-0 overflow-hidden rounded-2xl border border-line bg-white p-6 shadow-card transition-all duration-500 hover:-translate-y-1.5 hover:border-primary-200 hover:shadow-lift lg:w-auto"
                 data-delay={`${(i % 4) * 70}`}
               >
@@ -51,7 +70,7 @@ export function Process() {
                 <p className="mt-2 text-sm leading-relaxed text-muted">{s.description}</p>
 
                 {/* connector */}
-                {i < STEPS.length - 1 && (
+                {i < steps.length - 1 && (
                   <span className="absolute -right-3 top-1/2 hidden h-px w-6 bg-gradient-to-r from-primary-300 to-transparent lg:block" />
                 )}
               </div>

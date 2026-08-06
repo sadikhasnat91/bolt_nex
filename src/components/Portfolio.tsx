@@ -1,52 +1,43 @@
 import { ArrowUpRight } from 'lucide-react';
 import { Section, SectionHeading } from '@/components/Section';
+import { useContent, useSettings } from '@/lib/live';
 
 interface Project {
   title: string;
   category: string;
   image: string;
-  span: string;
-  featured?: boolean;
+  featured: boolean;
 }
 
-const PROJECTS: Project[] = [
-  {
-    title: 'Lumen — DTC rebrand & Shopify rebuild',
-    category: 'Branding · E-commerce',
-    image: 'https://images.pexels.com/photos/7598022/pexels-photo-7598022.jpeg?auto=compress&cs=tinysrgb&w=1200',
-    span: 'lg:col-span-2 lg:row-span-2',
-    featured: true,
-  },
-  {
-    title: 'Northwind — SaaS growth dashboard',
-    category: 'Web App · UI/UX',
-    image: 'https://images.pexels.com/photos/577195/pexels-photo-577195.jpeg?auto=compress&cs=tinysrgb&w=900',
-    span: '',
-  },
-  {
-    title: 'Quantix — Paid acquisition engine',
-    category: 'Google Ads · SEO',
-    image: 'https://images.pexels.com/photos/97080/pexels-photo-97080.jpeg?auto=compress&cs=tinysrgb&w=900',
-    span: '',
-  },
-  {
-    title: 'Vela — Flutter mobile banking app',
-    category: 'Flutter · Product',
-    image: 'https://images.pexels.com/photos/8546649/pexels-photo-8546649.jpeg?auto=compress&cs=tinysrgb&w=900',
-    span: '',
-  },
-  {
-    title: 'Helios — Lifecycle email automation',
-    category: 'Email · Marketing Automation',
-    image: 'https://images.pexels.com/photos/6476584/pexels-photo-6476584.jpeg?auto=compress&cs=tinysrgb&w=900',
-    span: '',
-  },
+interface HeadingSettings {
+  eyebrow: string;
+  titlePrefix: string;
+  titleHighlight: string;
+  titleSuffix: string;
+  description: string;
+}
+
+const FALLBACK_PROJECTS: (Project & { id: string })[] = [
+  { id: '1', title: 'Lumen — DTC rebrand & Shopify rebuild', category: 'Branding · E-commerce', image: 'https://images.pexels.com/photos/7598022/pexels-photo-7598022.jpeg?auto=compress&cs=tinysrgb&w=1200', featured: true },
+  { id: '2', title: 'Northwind — SaaS growth dashboard', category: 'Web App · UI/UX', image: 'https://images.pexels.com/photos/577195/pexels-photo-577195.jpeg?auto=compress&cs=tinysrgb&w=900', featured: false },
+  { id: '3', title: 'Quantix — Paid acquisition engine', category: 'Google Ads · SEO', image: 'https://images.pexels.com/photos/97080/pexels-photo-97080.jpeg?auto=compress&cs=tinysrgb&w=900', featured: false },
+  { id: '4', title: 'Vela — Flutter mobile banking app', category: 'Flutter · Product', image: 'https://images.pexels.com/photos/8546649/pexels-photo-8546649.jpeg?auto=compress&cs=tinysrgb&w=900', featured: false },
+  { id: '5', title: 'Helios — Lifecycle email automation', category: 'Email · Marketing Automation', image: 'https://images.pexels.com/photos/6476584/pexels-photo-6476584.jpeg?auto=compress&cs=tinysrgb&w=900', featured: false },
 ];
 
+const FALLBACK_HEADING: HeadingSettings = {
+  eyebrow: 'Selected work',
+  titlePrefix: 'Work that',
+  titleHighlight: 'moved the numbers',
+  titleSuffix: '',
+  description: 'A glimpse of recent engagements across branding, performance marketing, product, and engineering.',
+};
+
 function Card({ project, delay }: { project: Project; delay: number }) {
+  const span = project.featured ? 'lg:col-span-2 lg:row-span-2' : '';
   return (
     <article
-      className={`reveal group relative overflow-hidden rounded-3xl border border-line bg-ink shadow-card transition-all duration-500 hover:shadow-lift ${project.span}`}
+      className={`reveal group relative overflow-hidden rounded-3xl border border-line bg-ink shadow-card transition-all duration-500 hover:shadow-lift ${span}`}
       data-delay={`${delay}`}
     >
       <div className="relative h-full min-h-[14rem] w-full overflow-hidden">
@@ -86,17 +77,20 @@ function Card({ project, delay }: { project: Project; delay: number }) {
 }
 
 export function Portfolio() {
+  const projects = useContent<Project>('portfolio', FALLBACK_PROJECTS);
+  const heading = useSettings('portfolio_heading', FALLBACK_HEADING);
+
   return (
     <Section id="portfolio" className="py-24 sm:py-28">
       <SectionHeading
-        eyebrow="Selected work"
-        title={<>Work that <span className="gradient-text">moved the numbers</span></>}
-        description="A glimpse of recent engagements across branding, performance marketing, product, and engineering."
+        eyebrow={heading.eyebrow}
+        title={<>{heading.titlePrefix} <span className="gradient-text">{heading.titleHighlight}</span> {heading.titleSuffix}</>}
+        description={heading.description}
       />
 
       <div className="mt-14 grid auto-rows-[14rem] gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {PROJECTS.map((p, i) => (
-          <Card key={p.title} project={p} delay={(i % 3) * 80} />
+        {projects.map((p, i) => (
+          <Card key={p.id} project={p} delay={(i % 3) * 80} />
         ))}
       </div>
 

@@ -14,6 +14,7 @@ import { Pricing } from '@/components/Pricing';
 import { FAQ } from '@/components/FAQ';
 import { Contact } from '@/components/Contact';
 import { Footer } from '@/components/Footer';
+import { AdminPanel } from '@/components/AdminPanel';
 import { useReveal } from '@/lib/hooks';
 
 function ScrollProgress() {
@@ -99,6 +100,7 @@ function App() {
         <Contact />
       </main>
       <Footer />
+      <AdminPanel />
     </div>
   );
 }

@@ -10,6 +10,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   icon?: ReactNode;
   iconRight?: boolean;
   children: ReactNode;
+  href?: string;
 }
 
 const variants: Record<Variant, string> = {
@@ -34,13 +35,12 @@ export function Button({
   iconRight = true,
   children,
   className = '',
+  href,
   ...props
 }: ButtonProps) {
-  return (
-    <button
-      className={`group inline-flex items-center justify-center gap-2 rounded-full font-semibold transition-all duration-300 active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/50 focus-visible:ring-offset-2 ${variants[variant]} ${sizes[size]} ${className}`}
-      {...props}
-    >
+  const classes = `group inline-flex items-center justify-center gap-2 rounded-full font-semibold transition-all duration-300 active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/50 focus-visible:ring-offset-2 ${variants[variant]} ${sizes[size]} ${className}`;
+  const content = (
+    <>
       {icon && !iconRight && <span className="shrink-0">{icon}</span>}
       <span>{children}</span>
       {icon && iconRight && (
@@ -48,6 +48,20 @@ export function Button({
           {icon ?? <ArrowRight className="h-4 w-4" />}
         </span>
       )}
+    </>
+  );
+
+  if (href) {
+    return (
+      <a href={href} className={classes}>
+        {content}
+      </a>
+    );
+  }
+
+  return (
+    <button className={classes} {...props}>
+      {content}
     </button>
   );
 }

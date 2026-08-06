@@ -1,11 +1,38 @@
 import { ArrowRight, BarChart3, Mail, Megaphone, MousePointerClick, Search, Smartphone } from 'lucide-react';
 import { Button } from '@/components/Button';
+import { useContent, useSettings } from '@/lib/live';
 
-const STATS = [
-  { value: '500+', label: 'Projects Delivered' },
-  { value: '100+', label: 'Clients' },
-  { value: '4', label: 'Countries' },
-  { value: '98%', label: 'Satisfaction' },
+interface HeroStat {
+  value: string;
+  label: string;
+}
+
+interface HeroSettings {
+  badge: string;
+  headingPrefix: string;
+  headingHighlight: string;
+  headingSuffix: string;
+  description: string;
+  ctaPrimaryLabel: string;
+  ctaSecondaryLabel: string;
+}
+
+const FALLBACK_HERO: HeroSettings = {
+  badge: 'Awwwards-worthy digital experiences',
+  headingPrefix: 'Powering Business Growth Through',
+  headingHighlight: 'Digital Marketing',
+  headingSuffix: '& Modern Technology',
+  description:
+    'We blend performance marketing, design, and engineering to build brands that scale. From Google Ads to Flutter apps — Nexora Digital is your full-stack growth partner.',
+  ctaPrimaryLabel: 'Book Free Consultation',
+  ctaSecondaryLabel: 'View Our Work',
+};
+
+const FALLBACK_STATS: (HeroStat & { id: string })[] = [
+  { id: '1', value: '500+', label: 'Projects Delivered' },
+  { id: '2', value: '100+', label: 'Clients' },
+  { id: '3', value: '4', label: 'Countries' },
+  { id: '4', value: '98%', label: 'Satisfaction' },
 ];
 
 const FLOATING_CARDS = [
@@ -152,6 +179,9 @@ function DashboardMockup() {
 }
 
 export function Hero() {
+  const hero = useSettings('hero', FALLBACK_HERO);
+  const stats = useContent<HeroStat>('hero_stats', FALLBACK_STATS);
+
   return (
     <section
       id="home"
@@ -173,32 +203,31 @@ export function Hero() {
               <span className="absolute inline-flex h-2 w-2 animate-ping rounded-full bg-primary-400 opacity-75" />
               <span className="relative inline-flex h-2 w-2 rounded-full bg-primary-500" />
             </span>
-            Awwwards-worthy digital experiences
+            {hero.badge}
           </div>
 
           <h1 className="reveal mt-4 text-3xl font-extrabold leading-[1.08] tracking-tight text-ink sm:text-4xl md:text-5xl lg:text-[3.4rem] text-balance" data-delay="80">
-            Powering Business Growth Through{' '}
-            <span className="gradient-text">Digital Marketing</span> & Modern Technology
+            {hero.headingPrefix}{' '}
+            <span className="gradient-text">{hero.headingHighlight}</span> {hero.headingSuffix}
           </h1>
 
           <p className="reveal mt-3 max-w-xl text-base leading-relaxed text-muted text-pretty sm:text-lg" data-delay="160">
-            We blend performance marketing, design, and engineering to build brands that
-            scale. From Google Ads to Flutter apps — Nexora Digital is your full-stack growth partner.
+            {hero.description}
           </p>
 
           <div className="reveal mt-5 flex flex-wrap items-center gap-3" data-delay="240">
-            <Button size="lg" icon={<ArrowRight className="h-4 w-4" />}>
-              Book Free Consultation
+            <Button href="#contact" size="lg" icon={<ArrowRight className="h-4 w-4" />}>
+              {hero.ctaPrimaryLabel}
             </Button>
-            <Button variant="secondary" size="lg" icon={<ArrowRight className="h-4 w-4" />}>
-              View Our Work
+            <Button href="#portfolio" variant="secondary" size="lg" icon={<ArrowRight className="h-4 w-4" />}>
+              {hero.ctaSecondaryLabel}
             </Button>
           </div>
 
           {/* Stats */}
           <div className="reveal mt-6 grid w-full max-w-xl grid-cols-2 gap-px overflow-hidden rounded-2xl border border-line bg-line sm:grid-cols-4" data-delay="320">
-            {STATS.map((s) => (
-              <div key={s.label} className="bg-white px-4 py-3 text-center sm:py-3.5">
+            {stats.map((s) => (
+              <div key={s.id} className="bg-white px-4 py-3 text-center sm:py-3.5">
                 <p className="text-xl font-extrabold text-ink sm:text-2xl">{s.value}</p>
                 <p className="mt-0.5 text-[10px] font-medium uppercase tracking-wider text-muted">{s.label}</p>
               </div>

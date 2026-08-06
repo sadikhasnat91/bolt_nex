@@ -1,5 +1,6 @@
 import { Clock, MapPin } from 'lucide-react';
 import { Section, SectionHeading } from '@/components/Section';
+import { useContent, useSettings } from '@/lib/live';
 
 interface Office {
   country: string;
@@ -10,54 +11,45 @@ interface Office {
   image: string;
 }
 
-const OFFICES: Office[] = [
-  {
-    country: 'Bangladesh',
-    city: 'Dhaka',
-    tag: 'Head Office',
-    address: 'Level 12, Gulshan Avenue, Gulshan 1, Dhaka 1212',
-    hours: 'Sun–Thu · 9:00 AM – 6:00 PM (GMT+6)',
-    image: 'https://images.pexels.com/photos/13219418/pexels-photo-13219418.jpeg?auto=compress&cs=tinysrgb&w=900',
-  },
-  {
-    country: 'United States',
-    city: 'New York',
-    tag: 'Americas',
-    address: '350 Fifth Avenue, Suite 4200, New York, NY 10118',
-    hours: 'Mon–Fri · 9:00 AM – 6:00 PM (EST)',
-    image: 'https://images.pexels.com/photos/19238254/pexels-photo-19238254.jpeg?auto=compress&cs=tinysrgb&w=900',
-  },
-  {
-    country: 'United Kingdom',
-    city: 'London',
-    tag: 'Europe',
-    address: '1 Finsbury Avenue, Floor 8, London EC2M 2PF',
-    hours: 'Mon–Fri · 9:00 AM – 6:00 PM (GMT)',
-    image: 'https://images.pexels.com/photos/36631701/pexels-photo-36631701.jpeg?auto=compress&cs=tinysrgb&w=900',
-  },
-  {
-    country: 'Canada',
-    city: 'Toronto',
-    tag: 'North America',
-    address: '100 King Street West, Suite 5700, Toronto, ON M5X 1C7',
-    hours: 'Mon–Fri · 9:00 AM – 6:00 PM (EST)',
-    image: 'https://images.pexels.com/photos/32205998/pexels-photo-32205998.jpeg?auto=compress&cs=tinysrgb&w=900',
-  },
+interface HeadingSettings {
+  eyebrow: string;
+  titlePrefix: string;
+  titleHighlight: string;
+  titleSuffix: string;
+  description: string;
+}
+
+const FALLBACK_OFFICES: (Office & { id: string })[] = [
+  { id: '1', country: 'Bangladesh', city: 'Dhaka', tag: 'Head Office', address: 'Level 12, Gulshan Avenue, Gulshan 1, Dhaka 1212', hours: 'Sun–Thu · 9:00 AM – 6:00 PM (GMT+6)', image: 'https://images.pexels.com/photos/13219418/pexels-photo-13219418.jpeg?auto=compress&cs=tinysrgb&w=900' },
+  { id: '2', country: 'United States', city: 'New York', tag: 'Americas', address: '350 Fifth Avenue, Suite 4200, New York, NY 10118', hours: 'Mon–Fri · 9:00 AM – 6:00 PM (EST)', image: 'https://images.pexels.com/photos/19238254/pexels-photo-19238254.jpeg?auto=compress&cs=tinysrgb&w=900' },
+  { id: '3', country: 'United Kingdom', city: 'London', tag: 'Europe', address: '1 Finsbury Avenue, Floor 8, London EC2M 2PF', hours: 'Mon–Fri · 9:00 AM – 6:00 PM (GMT)', image: 'https://images.pexels.com/photos/36631701/pexels-photo-36631701.jpeg?auto=compress&cs=tinysrgb&w=900' },
+  { id: '4', country: 'Canada', city: 'Toronto', tag: 'North America', address: '100 King Street West, Suite 5700, Toronto, ON M5X 1C7', hours: 'Mon–Fri · 9:00 AM – 6:00 PM (EST)', image: 'https://images.pexels.com/photos/32205998/pexels-photo-32205998.jpeg?auto=compress&cs=tinysrgb&w=900' },
 ];
 
+const FALLBACK_HEADING: HeadingSettings = {
+  eyebrow: 'Global presence',
+  titlePrefix: 'Four offices,',
+  titleHighlight: 'one standard',
+  titleSuffix: '',
+  description: 'Follow-the-sun coverage across Asia, the Americas, and Europe — with local teams who understand local markets.',
+};
+
 export function Offices() {
+  const offices = useContent<Office>('offices', FALLBACK_OFFICES);
+  const heading = useSettings('offices_heading', FALLBACK_HEADING);
+
   return (
     <Section id="offices" className="py-24 sm:py-28">
       <SectionHeading
-        eyebrow="Global presence"
-        title={<>Four offices, <span className="gradient-text">one standard</span></>}
-        description="Follow-the-sun coverage across Asia, the Americas, and Europe — with local teams who understand local markets."
+        eyebrow={heading.eyebrow}
+        title={<>{heading.titlePrefix} <span className="gradient-text">{heading.titleHighlight}</span> {heading.titleSuffix}</>}
+        description={heading.description}
       />
 
       <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-        {OFFICES.map((o, i) => (
+        {offices.map((o, i) => (
           <article
-            key={o.country}
+            key={o.id}
             className="reveal group overflow-hidden rounded-3xl border border-line bg-white shadow-card transition-all duration-500 hover:-translate-y-1.5 hover:shadow-lift"
             data-delay={`${(i % 4) * 70}`}
           >

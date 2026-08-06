@@ -4,23 +4,38 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
-    "preview": "vite preview"
+    "dev": "cross-env NODE_OPTIONS=--experimental-sqlite vite",
+    "build": "cross-env NODE_OPTIONS=--experimental-sqlite tsc -b && cross-env NODE_OPTIONS=--experimental-sqlite vite build",
+    "preview": "vite preview",
+    "start": "cross-env NODE_OPTIONS=--experimental-sqlite tsx server/prod-entry.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.111.0",
+    "bcryptjs": "^3.0.3",
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
     "lucide-react": "^1.28.0",
+    "multer": "^2.2.0",
+    "nanoid": "^6.0.1",
     "react": "^19.2.8",
-    "react-dom": "^19.2.8"
+    "react-dom": "^19.2.8",
+    "react-router-dom": "^7.18.2"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.3",
+    "@types/cookie-parser": "^1.4.10",
+    "@types/express": "^5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/multer": "^2.2.0",
     "@types/node": "^22.20.1",
     "@types/react": "~19.2.18",
     "@types/react-dom": "~19.2.4",
     "@vitejs/plugin-react": "^6.0.5",
+    "cross-env": "^10.1.0",
     "tailwindcss": "^4.3.3",
+    "tsx": "^4.23.8",
     "typescript": "^6.0.3",
     "vite": "^8.2.0"
   },
